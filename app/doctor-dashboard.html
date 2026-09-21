@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinician Tele-Ophthalmology Triage — Netra</title>
+  <meta name="description" content="Netra Doctor Portal — Review AI-graded retinal scans, agree/override diagnoses, and triage rural PHC patients.">
+  
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column; background: var(--bg-main);">
+
+  <!-- TOP CLINICIAN HEADER -->
+  <header class="dash-topbar" style="padding: 12px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface); position: sticky; top: 0; z-index: 50;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="index.html" class="brand-logo" title="Back to Netra Home">
+        <svg class="logo-eye-icon" viewBox="0 0 48 48" fill="none" style="width: 32px; height: 32px;">
+          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5"/>
+          <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2"/>
+          <circle cx="24" cy="24" r="7" fill="currentColor"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-name" style="font-size: 1.15rem;">Netra</span>
+          <span class="brand-tagline" style="font-size: 0.65rem;">Clinician Triage Portal</span>
+        </div>
+      </a>
+      <div style="height: 24px; width: 1px; background: var(--border-subtle);"></div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="clinical-badge status-normal" style="font-size: 0.72rem; padding: 3px 8px;">
+          🩺 Doctor / Ophthalmologist Portal
+        </span>
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">
+          Christ University Health Centre / District Referral Hospital
+        </span>
+      </div>
+    </div>
+
+    <div class="dash-top-actions">
+      <!-- Role Switcher: Go to Patient Portal -->
+      <a href="dashboard.html" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; text-decoration: none;">
+        <span>👤 Switch to Patient Portal</span>
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="themeToggleDoctorBtn" title="Toggle Exam Room Mode">
+        <span id="themeDoctorIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Doctor Profile Chip -->
+      <div class="user-profile-chip" style="cursor: default;">
+        <div class="user-initial-avatar" style="background: var(--brand-primary); color: #fff;">M</div>
+        <div>
+          <strong style="font-size: 0.82rem; display: block; color: var(--text-primary);">Dr. Meera Iyer</strong>
+          <span style="font-size: 0.68rem; color: var(--text-secondary); display: block;">Retina Specialist • DOC-KA-2026-4412</span>
+        </div>
+      </div>
+
+      <a href="login.html" class="btn-control" title="Sign Out" style="padding: 6px 10px; font-size: 0.78rem; color: var(--status-critical); text-decoration: none;">
+        Sign Out 🚪
+      </a>
+    </div>
+  </header>
+
+  <!-- CLINICIAN BODY -->
+  <main style="flex: 1; padding: 24px; max-width: 1360px; margin: 0 auto; width: 100%;">
+    
+    <!-- STATS STRIP -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Pending Triage</span>
+          <span class="clinical-badge status-warning" style="font-size: 0.68rem;">4 High Priority</span>
+        </div>
+        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-top: 6px;">14</h3>
+        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">From 4 rural primary health centres</p>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Reviewed Today</span>
+          <span class="clinical-badge status-normal" style="font-size: 0.68rem;">Avg 22s / case</span>
+        </div>
+        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--brand-primary); margin-top: 6px;">38</h3>
+        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">29 Normal, 6 Mild, 3 Referable</p>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Referrals Dispatched</span>
+          <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Urgent Vitreo-Retinal</span>
+        </div>
+        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--status-critical); margin-top: 6px;">6</h3>
+        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Routed to District Hospital Laser Unit</p>
+      </div>
+
+      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">AI Concordance</span>
+          <span class="clinical-badge status-normal" style="font-size: 0.68rem;">QWK: 0.91</span>
+        </div>
+        <h3 style="font-size: 1.8rem; font-weight: 800; color: #22c55e; margin-top: 6px;">96.4%</h3>
+        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Doctor agreed with model classification</p>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKFLOW -->
+    <div style="display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start;">
+      
+      <!-- LEFT COLUMN: PATIENT TRIAGE QUEUE -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Triage Worklist (PHC Scans)</h4>
+          <span style="font-size: 0.72rem; color: var(--text-secondary);">Auto-Refreshed</span>
+        </div>
+
+        <!-- Filter tabs -->
+        <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+          <button class="sub-tab-btn active" style="font-size: 0.72rem; padding: 4px 8px;">All (14)</button>
+          <button class="sub-tab-btn" style="font-size: 0.72rem; padding: 4px 8px; color: var(--status-critical);">Referable ≥2 (4)</button>
+          <button class="sub-tab-btn" style="font-size: 0.72rem; padding: 4px 8px;">Normal 0-1 (10)</button>
+        </div>
+
+        <!-- Worklist Items -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          
+          <!-- Item 1: Selected Case (Ramesh Kumar) -->
+          <div style="padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--brand-primary); background: var(--bg-surface); cursor: pointer; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong style="font-size: 0.88rem; color: var(--text-primary);">Ramesh Kumar, 62M</strong>
+                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">PHC Chikkaballapur • Captured 12m ago</span>
+              </div>
+              <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Grade 2 Referable</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+              <span>AI Conf: 94.2% • OD Fundus</span>
+              <span style="color: var(--brand-primary); font-weight: 600;">Currently Active 👁️</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Suresh Gowda -->
+          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Suresh Gowda: Grade 3 Severe NPDR (Venous beading, multiple blot hemorrhages). Recommended immediate laser photocoagulation referral.')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong style="font-size: 0.88rem; color: var(--text-primary);">Suresh Gowda, 58M</strong>
+                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Devanahalli Rural PHC • Captured 25m ago</span>
+              </div>
+              <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Grade 3 Urgent</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+              <span>AI Conf: 97.8% • OS Fundus</span>
+              <button class="reminder-action-tag" style="font-size: 0.68rem;">Review</button>
+            </div>
+          </div>
+
+          <!-- Item 3: Sunita Devi -->
+          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Sunita Devi: Grade 1 Mild NPDR. 1 microaneurysm detected. Scheduled 6-month routine PHC recall.')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong style="font-size: 0.88rem; color: var(--text-primary);">Sunita Devi, 49F</strong>
+                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Sidlaghatta CHC • Captured 40m ago</span>
+              </div>
+              <span class="clinical-badge status-warning" style="font-size: 0.68rem;">Grade 1 Mild</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+              <span>AI Conf: 91.5% • OD Fundus</span>
+              <button class="reminder-action-tag" style="font-size: 0.68rem;">Review</button>
+            </div>
+          </div>
+
+          <!-- Item 4: Ananya Sharma -->
+          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Ananya Sharma: Grade 0 Normal (No Diabetic Retinopathy). Annual screening recall scheduled.')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong style="font-size: 0.88rem; color: var(--text-primary);">Ananya Sharma, 45F</strong>
+                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Christ Univ PHC • Screened today</span>
+              </div>
+              <span class="clinical-badge status-normal" style="font-size: 0.68rem;">Grade 0 Normal</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
+              <span>Verified by Dr. Meera Iyer</span>
+              <span style="color: #22c55e; font-size: 0.75rem; font-weight: 600;">Signed Off ✓</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: EXPLAINABLE AI CASE REVIEW PANEL -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+        
+        <!-- Case Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 20px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">Case: Ramesh Kumar</h3>
+              <span class="clinical-badge status-critical">Grade 2 — Moderate NPDR (Referable)</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">
+              Patient ID: <strong>NETRA-2026-9104</strong> • Age: <strong>62</strong> • Gender: <strong>Male</strong> • Diabetes: <strong>Type 2 (8 yrs)</strong> • Facility: <strong>PHC Chikkaballapur</strong>
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.72rem; color: var(--text-secondary); display: block;">Frontline Screening Officer</span>
+            <strong style="font-size: 0.85rem; color: var(--text-primary);">Lakshmi, PHC Nurse Officer</strong>
+          </div>
+        </div>
+
+        <!-- Case Inspection Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Left: Multi-Layer Viewer -->
+          <div>
+            <div style="position: relative; width: 100%; height: 320px; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center;">
+              <img id="doctorFundusView" src="assets/images/retinal_fundus_od.jpg" alt="Ramesh Fundus" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              <div id="doctorGradcamOverlay" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 60% 45%, rgba(255, 68, 68, 0.4) 0%, rgba(255, 170, 0, 0.25) 30%, transparent 65%); display: none;"></div>
+            </div>
+
+            <!-- Layer Switchers -->
+            <div style="display: flex; gap: 6px; margin-top: 10px; justify-content: center;">
+              <button class="btn-layer-toggle active" id="btnLayerDocOrig">Original</button>
+              <button class="btn-layer-toggle" id="btnLayerDocCam">Grad-CAM Heatmap</button>
+              <button class="btn-layer-toggle" id="btnLayerDocLes">Lesions Highlight</button>
+              <button class="btn-layer-toggle" id="btnLayerDocVes">Vessel Contrast</button>
+            </div>
+          </div>
+
+          <!-- Right: AI Findings & Clinician Verification -->
+          <div style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">AI Model Biomarker Readout</h4>
+              
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.83rem;">
+                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <span>Predicted DR Severity:</span>
+                  <strong style="color: var(--status-critical);">Grade 2 (Moderate NPDR)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <span>Calibrated Confidence:</span>
+                  <strong>94.2% (Ensemble ResNet-50)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <span>Microaneurysm Detection:</span>
+                  <span style="color: var(--accent-action); font-weight: 600;">7 detected (Temporal macula)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <span>Hard Exudates (Lipid leakage):</span>
+                  <span style="color: var(--status-critical); font-weight: 600;">Present (Inferotemporal ring)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <span>Optic Disc Cup-to-Disc Ratio:</span>
+                  <span>0.44 (Normal range &lt; 0.6)</span>
+                </div>
+              </div>
+
+              <!-- Doctor Clinical Note Input -->
+              <div style="margin-top: 14px;">
+                <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Clinician Diagnostic Remarks / Prescription:</label>
+                <textarea class="form-control" rows="2" style="font-size: 0.8rem;" placeholder="e.g. Confirmed Grade 2 NPDR with macular threat. Schedule dilated slit-lamp OCT and start tighter glycemic control.">Confirmed Moderate NPDR with inferotemporal exudates. Refer to District Ophthalmology Clinic for macular OCT.</textarea>
+              </div>
+            </div>
+
+            <!-- Action Buttons for Clinician -->
+            <div style="display: flex; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+              <button class="btn-primary" style="flex: 1.2; padding: 10px; font-size: 0.85rem;" onclick="alert('✓ Dr. Meera Iyer verified Case NETRA-2026-9104: Grade 2 NPDR confirmed. Referral notification dispatched to PHC Chikkaballapur.')">
+                ✓ Confirm AI Grade & Issue Referral
+              </button>
+              <button class="btn-secondary" style="flex: 0.8; padding: 10px; font-size: 0.85rem;" onclick="const newGrade = prompt('Enter override DR Grade (0: Normal, 1: Mild, 2: Moderate, 3: Severe, 4: Proliferative):', '1'); if(newGrade !== null) alert('Case updated to Grade ' + newGrade + ' by Dr. Meera Iyer.');">
+                ✎ Override Grade
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer style="padding: 14px 24px; text-align: center; font-size: 0.78rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle); background: var(--bg-surface);">
+    <span>Netra Clinician Tele-Triage • Human-in-the-Loop AI • SIH 2026 PS 26038</span>
+  </footer>
+
+  <script src="js/translations.js"></script>
+  <script>
+    // Simple theme switcher for doctor portal
+    const themeBtn = document.getElementById('themeToggleDoctorBtn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('netra_theme', next);
+      });
+      const savedTheme = localStorage.getItem('netra_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+
+    // Layer toggles for Doctor Fundus Viewer
+    const img = document.getElementById('doctorFundusView');
+    const overlay = document.getElementById('doctorGradcamOverlay');
+    const bOrig = document.getElementById('btnLayerDocOrig');
+    const bCam = document.getElementById('btnLayerDocCam');
+    const bLes = document.getElementById('btnLayerDocLes');
+    const bVes = document.getElementById('btnLayerDocVes');
+    const allBtns = [bOrig, bCam, bLes, bVes];
+
+    function activateBtn(btn) {
+      allBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    if (bOrig) {
+      bOrig.onclick = () => {
+        activateBtn(bOrig);
+        img.style.filter = 'none';
+        overlay.style.display = 'none';
+      };
+    }
+    if (bCam) {
+      bCam.onclick = () => {
+        activateBtn(bCam);
+        img.style.filter = 'none';
+        overlay.style.display = 'block';
+      };
+    }
+    if (bLes) {
+      bLes.onclick = () => {
+        activateBtn(bLes);
+        img.style.filter = 'contrast(140%) brightness(95%)';
+        overlay.style.display = 'none';
+      };
+    }
+    if (bVes) {
+      bVes.onclick = () => {
+        activateBtn(bVes);
+        img.style.filter = 'grayscale(100%) contrast(200%) invert(20%)';
+        overlay.style.display = 'none';
+      };
+    }
+  </script>
+</body>
+</html>

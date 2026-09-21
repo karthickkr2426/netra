@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/app/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/login",
+      "destination": "/app/login.html",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/app/dashboard.html",
+      "permanent": false
+    },
+    {
+      "source": "/doctor-dashboard",
+      "destination": "/app/doctor-dashboard.html",
+      "permanent": false
+    }
+  ]
+}
