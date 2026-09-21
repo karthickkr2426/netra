@@ -3,23 +3,13 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/",
-      "destination": "/app/index.html",
+      "source": "/app",
+      "destination": "/",
       "permanent": false
     },
     {
-      "source": "/login",
-      "destination": "/app/login.html",
-      "permanent": false
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/app/dashboard.html",
-      "permanent": false
-    },
-    {
-      "source": "/doctor-dashboard",
-      "destination": "/app/doctor-dashboard.html",
+      "source": "/app/:path*",
+      "destination": "/:path*",
       "permanent": false
     }
   ]
