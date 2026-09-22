@@ -1005,6 +1005,8 @@
   function handleSignOut(e) {
     if (e) e.preventDefault();
     localStorage.removeItem('netra_active_patient');
+    localStorage.removeItem('netra_active_role');
+    localStorage.removeItem('netra_active_doctor');
     window.location.href = "login.html";
   }
 
@@ -1607,6 +1609,7 @@
 
         // Demo Ananya
         if (entered.toLowerCase().startsWith('ananya')) {
+          localStorage.setItem('netra_active_role', 'patient');
           if (elements.authStatusAlert) {
             elements.authStatusAlert.className = "auth-status-alert success";
             elements.authStatusAlert.style.display = "flex";
@@ -1628,6 +1631,7 @@
         );
 
         if (found) {
+          localStorage.setItem('netra_active_role', 'patient');
           setStoredPatient(found);
           if (elements.authStatusAlert) {
             elements.authStatusAlert.className = "auth-status-alert success";
@@ -1635,6 +1639,7 @@
             elements.authStatusAlert.innerHTML = `<span>✓</span><div><strong>Authenticated!</strong> Welcome back, ${found.name}. Opening your dashboard...</div>`;
           }
         } else {
+          localStorage.setItem('netra_active_role', 'patient');
           // New patient account
           const newPatient = {
             name: entered,
@@ -1671,6 +1676,7 @@
           elements.authStatusAlert.innerHTML = `<span>✓</span><div><strong>Authenticated!</strong> Loading patient record (Ananya Sharma)...</div>`;
         }
         setStoredPatient(DEMO_PATIENT);
+        localStorage.setItem('netra_active_role', 'patient');
         setTimeout(() => {
           window.location.href = "dashboard.html";
         }, 550);
@@ -1710,6 +1716,7 @@
         localStorage.setItem('netra_registered_patients', JSON.stringify(registeredList));
 
         setStoredPatient(newPatient);
+        localStorage.setItem('netra_active_role', 'patient');
 
         if (elements.authStatusAlert) {
           elements.authStatusAlert.className = "auth-status-alert success";
@@ -1745,6 +1752,7 @@
           facility: hospital
         };
         localStorage.setItem('netra_active_doctor', JSON.stringify(clinicianProfile));
+        localStorage.setItem('netra_active_role', 'specialist');
 
         if (elements.authStatusAlert) {
           elements.authStatusAlert.className = 'auth-status-alert success';
@@ -1753,7 +1761,7 @@
         }
 
         setTimeout(() => {
-          window.location.href = 'doctor-dashboard.html';
+          window.location.href = 'index.html';
         }, 600);
       });
     }
@@ -1768,6 +1776,7 @@
           facility: 'Christ University Health Centre (Bengaluru)'
         };
         localStorage.setItem('netra_active_doctor', JSON.stringify(clinicianProfile));
+        localStorage.setItem('netra_active_role', 'specialist');
 
         if (elements.authStatusAlert) {
           elements.authStatusAlert.className = 'auth-status-alert success';
@@ -1776,7 +1785,7 @@
         }
 
         setTimeout(() => {
-          window.location.href = 'doctor-dashboard.html';
+          window.location.href = 'index.html';
         }, 550);
       });
     }
@@ -1902,6 +1911,24 @@
         openRemindersManager();
       });
     }
+
+    // Patient sidebar navigation: keep the active state and reveal the matching dashboard area.
+    document.querySelectorAll('.dash-menu-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.dash-menu-item').forEach((menuItem) => menuItem.classList.remove('active'));
+        item.classList.add('active');
+
+        if (item.id === 'navItemAppointments' && elements.modalAppointment) {
+          elements.modalAppointment.classList.add('open');
+          return;
+        }
+        if (item.id === 'navItemReports' || item.id === 'navItemReminders') return;
+
+        const target = document.getElementById(item.dataset.target || '');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (item.id === 'navItemProfile' && elements.userProfileChipBtn) elements.userProfileChipBtn.click();
+      });
+    });
 
     // 20-20-20 Timer Modal Controls
     if (elements.btnToggleTimer) {

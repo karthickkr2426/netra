@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      if (localStorage.getItem('netra_active_role') !== 'patient') window.location.replace('login.html');
+    }());
+  </script>
   <title>Patient Portal — Netra Eye Care</title>
   <meta name="description" content="Netra Patient Dashboard — Vision journey, retinal screening results, appointments, and ophthalmic health tracking.">
   
@@ -33,7 +38,7 @@
 
         <!-- Navigation Menu -->
         <ul class="dash-menu-list">
-          <li class="dash-menu-item active">
+          <li class="dash-menu-item active" id="navItemHome" data-target="dash-content-body">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
@@ -61,7 +66,7 @@
             <span data-i18n="menuAppointments">Appointments</span>
           </li>
 
-          <li class="dash-menu-item">
+          <li class="dash-menu-item" id="navItemEyeHealth" data-target="cardOverviewContainer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/>
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -78,7 +83,7 @@
             <span class="notification-dot"></span>
           </li>
 
-          <li class="dash-menu-item">
+          <li class="dash-menu-item" id="navItemResources" data-target="cardTipsContainer">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
@@ -86,7 +91,7 @@
             <span data-i18n="menuResources">Resources</span>
           </li>
 
-          <li class="dash-menu-item">
+          <li class="dash-menu-item" id="navItemProfile" data-target="userProfileChipBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
@@ -205,7 +210,7 @@
       </header>
 
       <!-- DASHBOARD CARDS GRID -->
-      <div class="dash-content-body">
+      <div class="dash-content-body" id="dash-content-body">
 
         <!-- PATIENT WELCOME ONBOARDING BANNER -->
         <div id="newPatientWelcomeBanner" class="new-patient-welcome-card" style="display: none;">
@@ -358,7 +363,7 @@
           </div>
 
           <!-- Card: Eye Care Tips -->
-          <div class="card-tips">
+          <div class="card-tips" id="cardTipsContainer">
             <div>
               <div class="card-header-line">
                 <h4 class="card-title" data-i18n="tipsTitle">Eye Care Tips</h4>

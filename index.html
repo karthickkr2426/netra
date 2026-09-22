@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      const role = localStorage.getItem('netra_active_role');
+      if (role === 'patient') window.location.replace('dashboard.html');
+      if (role === 'specialist' || role === 'phc' || role === 'district') window.location.replace('doctor-dashboard.html');
+    }());
+  </script>
   <title>Netra — AI-Powered Eye Care for Everyone</title>
   <meta name="description" content="Explainable AI Diabetic Retinopathy screening and comprehensive eye care platform for rural and urban India.">
   

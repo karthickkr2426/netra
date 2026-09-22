@@ -3,347 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinician Tele-Ophthalmology Triage — Netra</title>
-  <meta name="description" content="Netra Doctor Portal — Review AI-graded retinal scans, agree/override diagnoses, and triage rural PHC patients.">
-  
+  <script>
+    (function () {
+      const role = localStorage.getItem('netra_active_role');
+      if (!['specialist', 'phc', 'district'].includes(role)) window.location.replace('login.html');
+    }());
+  </script>
+  <title>Netra Clinical Workstation</title>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    :root { --work-bg: #f4f6f9; --work-surface: #fff; --work-muted: #627289; --work-line: rgba(26,43,76,.12); --work-shadow: 0 4px 16px rgba(15,20,28,.06); --work-radius: 10px; }
+    [data-theme="dark"] { --work-bg: #0f141c; --work-surface: #18202c; --work-muted: #94a3b8; --work-line: rgba(226,232,240,.12); --work-shadow: 0 4px 16px rgba(0,0,0,.25); }
+    .workstation { min-height: 100vh; display: grid; grid-template-columns: 218px minmax(0, 1fr); background: var(--work-bg); color: var(--text-primary); }
+    .work-sidebar { min-height: 100vh; display: flex; flex-direction: column; padding: 18px 14px; background: var(--work-surface); border-right: 1px solid var(--work-line); position: sticky; top: 0; align-self: start; }
+    .sidebar-brand { display: flex; align-items: center; gap: 9px; padding: 0 4px 22px; border-bottom: 1px solid var(--work-line); }.sidebar-brand strong, .sidebar-brand small { display: block; }.sidebar-brand strong { color: var(--brand-primary); font-size: 17px; }.sidebar-brand small { color: var(--work-muted); font-size: 9px; line-height: 1.2; }
+    .sidebar-section-label { margin: 22px 9px 8px; color: var(--work-muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }.role-nav { display: flex; flex-direction: column; gap: 4px; overflow: visible; }.role-nav button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 11px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--work-muted); text-align: left; white-space: nowrap; }.role-nav button::before { width: 18px; color: currentColor; text-align: center; font-size: 14px; }.role-nav button[data-view="specialist"]::before { content: '◉'; }.role-nav button[data-view="phc"]::before { content: '⌂'; }.role-nav button[data-view="district"]::before { content: '▦'; }.role-nav button[data-view="patient"]::before { content: '◌'; }.role-nav button.active, .role-nav button:hover { color: var(--brand-primary); background: var(--brand-primary-light); border-color: transparent; }
+    .sidebar-status { margin-top: auto; padding: 12px 10px; border-radius: 9px; background: var(--brand-primary-light); color: var(--work-muted); font-size: 10px; }.sidebar-status strong { display: block; margin-bottom: 4px; color: var(--text-primary); font-size: 11px; }.network-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--status-normal); }
+    .work-shell { min-width: 0; }.work-header { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 24px; background: var(--work-surface); border-bottom: 1px solid var(--work-line); position: sticky; top: 0; z-index: 10; }
+    .work-brand { display: flex; align-items: center; gap: 10px; min-width: max-content; }.work-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--brand-primary); color: #fff; font-weight: 800; font-size: 20px; }.work-brand strong, .work-brand small { display: block; }.work-brand strong { font-size: 16px; }.work-brand small { color: var(--work-muted); font-size: 10px; }
+    .work-tools { display: flex; align-items: center; gap: 8px; }.work-tools button, .work-tools a { padding: 8px 10px; border: 1px solid var(--work-line); border-radius: 6px; background: var(--work-bg); color: var(--text-primary); font-size: 12px; text-decoration: none; }.work-profile { padding-left: 10px; border-left: 1px solid var(--work-line); color: var(--work-muted); font-size: 11px; }.work-profile strong { display: block; color: var(--text-primary); }
+    .work-main { max-width: 1440px; margin: 0 auto; padding: 20px 24px 36px; }.workstation-view { display: none; }.workstation-view.active { display: block; }
+    .work-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; margin-bottom: 16px; border-left: 3px solid var(--brand-primary); border-radius: var(--work-radius); background: var(--work-surface); box-shadow: var(--work-shadow); }.work-summary h1 { margin: 0; font-size: 17px; }.work-summary p { margin: 3px 0 0; color: var(--work-muted); font-size: 12px; }.summary-number { color: var(--status-critical); font: 700 20px monospace; }.summary-number small { font: 11px var(--font-family); color: var(--work-muted); }
+    .specialist-grid { display: grid; grid-template-columns: 270px minmax(0, 1fr) 320px; gap: 16px; align-items: start; }.work-panel, .evidence-card, .metric-card, .analytics-card, .patient-panel { background: var(--work-surface); border: 1px solid var(--work-line); border-radius: var(--work-radius); box-shadow: var(--work-shadow); }.panel-head, .patient-panel { padding: 15px; }.panel-head h2, .patient-panel h2 { margin: 0; font-size: 15px; }.panel-head p, .patient-panel p { margin: 3px 0 12px; color: var(--work-muted); font-size: 11px; }.queue-count { float: right; color: var(--work-muted); font-size: 10px; }
+    .queue-filter { display: flex; gap: 4px; }.queue-filter button { flex: 1; padding: 6px 2px; border: 1px solid var(--work-line); border-radius: 5px; background: var(--work-bg); color: var(--work-muted); font-size: 10px; }.queue-filter button.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }.queue-list { display: flex; flex-direction: column; gap: 7px; padding: 9px; max-height: 530px; overflow: auto; }.queue-patient { display: flex; justify-content: space-between; gap: 8px; width: 100%; text-align: left; padding: 10px; border: 1px solid var(--work-line); border-radius: 8px; background: var(--work-surface); color: var(--text-primary); }.queue-patient:hover, .queue-patient.selected { border-color: var(--brand-primary); background: var(--work-bg); }.queue-patient small { display: block; margin-top: 3px; color: var(--work-muted); font-size: 10px; }.severity { color: var(--status-critical); font-size: 10px; white-space: nowrap; }.severity.routine { color: var(--status-normal); }.queue-foot { display: flex; justify-content: space-between; padding: 12px 15px; border-top: 1px solid var(--work-line); color: var(--work-muted); font-size: 10px; }.queue-foot strong { display: block; color: var(--text-primary); font: 12px monospace; }
+    .case-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }.case-head h2 { margin: 0; font-size: 19px; }.case-head p { margin: 2px 0 0; color: var(--work-muted); font-size: 11px; }.case-controls { display: flex; align-items: center; gap: 10px; }.eye-tabs { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--work-line); border-radius: 7px; background: var(--work-bg); }.eye-tab { border: 0; border-radius: 5px; background: transparent; color: var(--work-muted); padding: 6px 9px; font-size: 11px; }.eye-tab.active { background: var(--work-surface); color: var(--text-primary); box-shadow: var(--work-shadow); }.timer { min-width: 105px; padding: 6px 9px; border: 1px solid var(--work-line); border-radius: 7px; background: var(--work-bg); color: var(--work-muted); font-size: 10px; }.timer strong { display: block; color: var(--brand-primary); font: 15px monospace; }
+    .viewer { overflow: hidden; }.canvas-wrap { position: relative; display: grid; place-items: center; height: 440px; background: #05080c; overflow: hidden; }.canvas-wrap canvas { width: 100%; height: 100%; object-fit: contain; transform-origin: center; }.loupe { display: none; position: absolute; width: 116px; height: 116px; border: 2px solid var(--brand-primary); border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,.24); pointer-events: none; }.hud { position: absolute; top: 14px; left: 14px; display: flex; gap: 7px; }.hud span { padding: 5px 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(15,20,28,.85); color: #f8fafc; font-size: 10px; }.hud .ok:before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: var(--status-normal); }.layers { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; padding: 10px; border-top: 1px solid var(--work-line); }.layers label { color: var(--work-muted); font-size: 11px; margin-right: 4px; }.layer-button, .tool-button { border: 1px solid var(--work-line); border-radius: 5px; background: var(--work-bg); color: var(--text-primary); padding: 6px 8px; font-size: 10px; }.layer-button.active, .tool-button:hover { border-color: var(--brand-primary); color: var(--brand-primary); }.key { display: inline-grid; place-items: center; width: 16px; height: 16px; margin-right: 3px; border-radius: 3px; background: var(--brand-secondary); color: #fff; font-size: 9px; }
+    .legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-top: 12px; }.legend-item { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 9px; border: 1px solid var(--work-line); border-radius: var(--work-radius); background: var(--work-surface); box-shadow: var(--work-shadow); font-size: 10px; }.legend-item b { margin-left: auto; color: var(--work-muted); font: 9px monospace; white-space: nowrap; }.swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }.swatch-ma { background: #ef4444; }.swatch-he { background: #3b82f6; }.swatch-ex { background: #eab308; }.swatch-nv { background: #d946ef; }
+    .compare-panel { display: none; margin-top: 12px; padding: 14px; border: 1px solid var(--work-line); border-radius: var(--work-radius); background: var(--work-surface); }.compare-panel.open { display: block; }.compare-head { display: flex; justify-content: space-between; color: var(--work-muted); font-size: 11px; }.timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }.timeline div { padding: 9px; border: 1px solid var(--work-line); border-radius: 6px; background: var(--work-bg); font-size: 10px; }.timeline b { display: block; color: var(--text-primary); margin-bottom: 4px; }
+    .action-bar { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; padding: 12px; border: 1px solid var(--work-line); border-radius: var(--work-radius); background: var(--work-surface); }.action-bar button { border: 0; border-radius: 6px; padding: 9px 12px; color: #fff; font-weight: 700; font-size: 11px; }.agree { background: var(--status-normal); }.override, .secondary-action { background: var(--work-bg); border: 1px solid var(--work-line) !important; color: var(--text-primary) !important; }
+    .evidence { display: flex; flex-direction: column; gap: 12px; }.evidence-card { padding: 16px; }.evidence-card h3 { margin: 13px 0 5px; font-size: 15px; }.evidence-card p { margin: 0; color: var(--work-muted); font-size: 11px; line-height: 1.5; }.evidence-badge, .status-badge { display: inline-block; padding: 5px 8px; border-radius: 999px; background: var(--status-critical-bg); color: var(--status-critical-text); font-size: 10px; font-weight: 800; }.status-badge.normal { background: var(--status-normal-bg); color: var(--status-normal-text); }.status-badge.warning { background: var(--status-warning-bg); color: var(--status-warning-text); }.confidence { float: right; color: var(--brand-primary); font: 11px monospace; }.flag { display: flex; gap: 8px; margin-top: 9px; padding: 8px; border: 1px solid var(--work-line); border-left: 3px solid var(--status-critical); border-radius: 6px; background: var(--status-critical-bg); font-size: 10px; }.flag.warning { border-left-color: var(--status-warning); background: var(--status-warning-bg); }.flag.normal { border-left-color: var(--status-normal); background: var(--status-normal-bg); }.flag strong, .flag small { display: block; }.flag small { color: var(--work-muted); }.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }.check { padding: 7px; border: 1px solid var(--work-line); border-radius: 5px; background: var(--work-bg); color: var(--work-muted); font-size: 10px; }.check.ok { color: var(--status-normal); }.assistant { margin-top: 12px; padding: 10px; border: 1px solid var(--work-line); border-radius: 7px; background: var(--work-bg); font-size: 11px; }.assistant-prompt { display: block; width: 100%; margin-top: 6px; border: 1px solid var(--work-line); border-radius: 5px; background: var(--work-bg); color: var(--brand-primary); padding: 6px; text-align: left; font-size: 10px; }
+    .metric-grid, .analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }.metric-card, .analytics-card { padding: 16px; }.metric-card span, .analytics-card p { color: var(--work-muted); font-size: 11px; }.metric-card strong { display: block; margin-top: 7px; font: 700 24px monospace; }.district-stack { display: grid; gap: 14px; }.analytics-grid { grid-template-columns: 1fr 1fr; }.clinical-table { width: 100%; border-collapse: collapse; font-size: 11px; }.clinical-table th, .clinical-table td { padding: 9px 7px; border-bottom: 1px solid var(--work-line); text-align: left; }.matrix-row { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 8px; align-items: center; margin-top: 12px; font-size: 11px; }.matrix-bar-wrap { height: 8px; background: var(--work-bg); border-radius: 99px; overflow: hidden; }.matrix-bar { height: 100%; background: var(--brand-primary); }.simulation { display: grid; grid-template-columns: 300px 1fr; gap: 18px; }.sim-control { margin-bottom: 15px; }.sim-control label { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; }.sim-control input, .sim-control select { width: 100%; margin-top: 8px; }.sim-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }.result-box { padding: 14px; border: 1px solid var(--work-line); border-radius: 8px; background: var(--work-bg); }.result-box small, .result-box strong { display: block; }.result-box small { color: var(--work-muted); font-size: 10px; }.result-box strong { margin-top: 6px; font: 700 20px monospace; }
+    .phc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }.step-card { padding: 16px; }.step-card h2 { margin: 8px 0 4px; font-size: 16px; }.step-card p { color: var(--work-muted); font-size: 11px; }.capture-box { display: grid; place-items: center; min-height: 210px; margin: 14px 0; border: 1px dashed var(--work-line); border-radius: 8px; background: #05080c; color: #fff; text-align: center; }.capture-box span { display: block; }.capture-box small { display: block; margin-top: 10px; color: #cbd5e1; }.capture-actions { display: flex; flex-wrap: wrap; gap: 6px; }.capture-actions button, .phc-actions button { padding: 8px; border: 1px solid var(--work-line); border-radius: 6px; background: var(--work-bg); color: var(--text-primary); font-size: 10px; }.tri-state { padding: 18px; border-radius: 8px; background: var(--status-critical-bg); border: 1px solid var(--status-critical-border); }.tri-state h3 { margin: 0; color: var(--status-critical-text); font-size: 14px; }.tri-state p { margin-bottom: 0; }.audio-box { padding: 14px; border: 1px solid var(--work-line); border-radius: 8px; background: var(--work-bg); }.audio-box button { padding: 9px 12px; border-radius: 6px; background: var(--brand-primary); color: #fff; }.transcript { margin-top: 12px; padding: 10px; border-left: 3px solid var(--brand-primary); font-size: 12px; }
+    .patient-content { display: none !important; }
+    @media (max-width: 1180px) { .specialist-grid { grid-template-columns: 240px minmax(0, 1fr); }.evidence { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); }.metric-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 820px) { .workstation { display: block; }.work-sidebar { min-height: auto; padding: 10px 12px; position: sticky; top: 0; z-index: 20; border-right: 0; border-bottom: 1px solid var(--work-line); }.sidebar-brand { padding: 0 4px 10px; border-bottom: 0; }.sidebar-section-label, .sidebar-status { display: none; }.role-nav { display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 4px; overflow-x: auto; }.role-nav button { justify-content: center; padding: 8px 6px; font-size: 10px; }.role-nav button::before { display: none; }.work-header { flex-wrap: wrap; }.work-brand { display: none; }.work-tools { margin-left: auto; }.specialist-grid > aside.work-panel { height: auto; min-height: 0; position: static; }.specialist-grid, .phc-grid, .simulation, .analytics-grid { grid-template-columns: 1fr; }.evidence { display: flex; }.case-head { align-items: flex-start; flex-direction: column; }.case-controls { width: 100%; justify-content: space-between; }.canvas-wrap { height: 300px; }.legend, .sim-results { grid-template-columns: 1fr 1fr; }.action-bar { flex-direction: column; }.timeline { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .work-main { padding: 14px 12px 28px; }.work-tools .work-profile { display: none; }.metric-grid, .legend, .sim-results, .education-grid, .action-grid, .patient-eyes { grid-template-columns: 1fr; }.case-controls { align-items: stretch; flex-direction: column; }.work-summary { align-items: flex-start; flex-direction: column; } }
+    .workstation { grid-template-columns: 240px minmax(0, 1fr); background: var(--bg-main); }
+    .work-sidebar { padding: 20px 16px; background: var(--bg-surface); border-right-color: var(--border-subtle); }
+    .sidebar-brand { gap: 12px; padding: 0 0 20px; border-bottom-color: var(--border-subtle); }
+    .sidebar-brand .work-mark { width: 38px; height: 38px; border-radius: var(--radius-md); }
+    .sidebar-brand strong { font-size: 1.25rem; }.sidebar-brand small { font-size: .65rem; }
+    .sidebar-section-label { margin: 24px 14px 8px; color: var(--text-tertiary); }
+    .role-nav { gap: 4px; }
+    .role-nav button { gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); font-size: .92rem; font-weight: var(--font-weight-medium); }
+    .role-nav button.active { background: var(--brand-primary-light); color: var(--brand-primary); font-weight: var(--font-weight-bold); }
+    .sidebar-status { border-radius: var(--radius-md); padding: 16px; background: var(--brand-primary-light); }
+    .work-header { padding: 16px 28px; background: var(--bg-main); border-bottom-color: var(--border-subtle); }
+    .work-tools { gap: 18px; }.work-tools button, .work-tools a { border-color: var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-surface); }
+    .work-profile { padding: 4px 10px 4px 4px; border: 1px solid var(--border-subtle); border-radius: var(--radius-full); background: var(--bg-surface); }
+    .work-main { padding: 24px 28px 40px; }
+    .work-summary, .work-panel, .evidence-card, .metric-card, .analytics-card, .patient-panel, .legend-item, .compare-panel, .action-bar { border-color: var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    .work-summary { padding: 16px 18px; margin-bottom: 20px; }
+    .specialist-grid { gap: 20px; }.queue-list { gap: 8px; padding: 10px; }.queue-patient { border-color: var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; }.specialist-grid > aside.work-panel { min-height: 560px; height: calc(100vh - 170px); display: flex; flex-direction: column; position: sticky; top: 96px; }.specialist-grid > aside.work-panel .queue-list { flex: 1; max-height: none; }
+    .viewer .canvas-wrap { border-radius: 0; }.layers { padding: 12px; }.layer-button, .tool-button { border-color: var(--border-subtle); border-radius: var(--radius-sm); padding: 6px 12px; }
+    .legend { gap: 14px; margin-top: 14px; }.legend-item { padding: 12px; }.action-bar { margin-top: 14px; padding: 14px; }
+    .evidence { gap: 14px; }.evidence-card { padding: 16px; }.flag, .check, .assistant, .result-box, .audio-box { border-color: var(--border-subtle); border-radius: var(--radius-sm); }
+    .metric-grid, .analytics-grid { gap: 14px; }.district-stack { gap: 20px; }.phc-grid { gap: 20px; }
+  </style>
 </head>
-<body style="min-height: 100vh; display: flex; flex-direction: column; background: var(--bg-main);">
-
-  <!-- TOP CLINICIAN HEADER -->
-  <header class="dash-topbar" style="padding: 12px 24px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface); position: sticky; top: 0; z-index: 50;">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <a href="index.html" class="brand-logo" title="Back to Netra Home">
-        <svg class="logo-eye-icon" viewBox="0 0 48 48" fill="none" style="width: 32px; height: 32px;">
-          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="2.5"/>
-          <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="2"/>
-          <circle cx="24" cy="24" r="7" fill="currentColor"/>
-        </svg>
-        <div class="brand-text">
-          <span class="brand-name" style="font-size: 1.15rem;">Netra</span>
-          <span class="brand-tagline" style="font-size: 0.65rem;">Clinician Triage Portal</span>
-        </div>
-      </a>
-      <div style="height: 24px; width: 1px; background: var(--border-subtle);"></div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="clinical-badge status-normal" style="font-size: 0.72rem; padding: 3px 8px;">
-          🩺 Doctor / Ophthalmologist Portal
-        </span>
-        <span style="font-size: 0.78rem; color: var(--text-secondary);">
-          Christ University Health Centre / District Referral Hospital
-        </span>
-      </div>
+<body>
+  <div class="workstation">
+    <aside class="work-sidebar">
+      <a class="sidebar-brand" href="index.html"><span class="work-mark">N</span><span><strong>Netra</strong><small>Clinical Tele-Ophthalmology<br>SIH 26038</small></span></a>
+      <span class="sidebar-section-label">Workspaces</span>
+      <nav class="role-nav" aria-label="Role-based workspace navigation"><button data-view="specialist">Specialist Workstation</button><button data-view="phc">PHC Village Kiosk</button><button data-view="district">District Operations</button></nav>
+      <div class="sidebar-status"><strong><span class="network-dot"></span>Network online</strong>Clinical telemetry synced<br>Last sync: just now</div>
+    </aside>
+    <div class="work-shell">
+      <header class="work-header">
+        <a class="work-brand" href="index.html"><span class="work-mark">N</span><span><strong>NETRA v2</strong><small>Clinical Tele-Ophthalmology · SIH 26038</small></span></a>
+        <div class="work-tools"><button id="theme-button" title="Toggle exam room mode">☾</button><span class="work-profile"><strong>Dr. Meera Iyer</strong><span id="current-role-label">Specialist Workstation</span></span><a href="login.html">Sign out</a></div>
+      </header>
+      <main class="work-main">
+      <section class="workstation-view" data-view="specialist"><div class="work-summary"><div><h1>Review the highest-risk cases first.</h1><p>Netra screens retinal images at the PHC, highlights the evidence, and keeps the specialist as the final decision-maker.</p></div><span class="summary-number">5 <small>cases waiting</small></span></div><div class="specialist-grid"><aside class="work-panel"><div class="panel-head"><span class="queue-count">5 Pending</span><h2>Triage Queue</h2><p>Sorted by severity and risk score</p><div class="queue-filter"><button class="active" data-filter="all">All</button><button data-filter="urgent">Urgent</button><button data-filter="routine">Routine</button></div></div><div class="queue-list" id="patient-queue"></div><div class="queue-foot"><span>Review Target<strong>&lt; 30 Seconds</strong></span><span>Session Avg<strong>19.4s</strong></span></div></aside><section><div class="work-panel case-head"><div><h2 id="patient-name">Ramesh Gowda</h2><p>54 Yrs · Male · Diabetic 9 Yrs · ID: #KA-CKB-2026-084<br>Bagepalli PHC (60 km away)</p></div><div class="case-controls"><div class="eye-tabs"><button class="eye-tab active" data-eye="OD">OD Right ·</button><button class="eye-tab" data-eye="OS">OS Left ·</button></div><div class="timer">Review Elapsed<strong id="review-timer">00:19</strong></div></div></div><div class="work-panel viewer"><div class="canvas-wrap"><canvas id="retina-canvas" width="800" height="600" aria-label="Retinal fundus image display"></canvas><div class="loupe" id="retina-loupe"></div><div class="hud"><span class="ok">Quality: Gradable (SNR 8.9 dB)</span><span id="eye-hud">OD · Macula Centred</span></div></div><div class="layers"><label>Diagnostic Layers:</label><button class="layer-button active" data-layer="1"><span class="key">1</span>Original</button><button class="layer-button" data-layer="2"><span class="key">2</span>Enhanced</button><button class="layer-button" data-layer="3"><span class="key">3</span>Grad-CAM</button><button class="layer-button" data-layer="4"><span class="key">4</span>Lesions <b>23</b></button><button class="layer-button" data-layer="5"><span class="key">5</span>Vessels</button><button class="tool-button" id="zoom-reset">Reset Zoom</button><button class="tool-button" id="compare-button">Compare Timeline</button></div></div><div class="legend"><div class="legend-item"><i class="swatch swatch-ma"></i><span>Microaneurysms</span><b>14</b></div><div class="legend-item"><i class="swatch swatch-he"></i><span>Hemorrhages</span><b>9</b></div><div class="legend-item"><i class="swatch swatch-ex"></i><span>Hard Exudates</span><b>3.2%</b></div><div class="legend-item"><i class="swatch swatch-nv"></i><span>Neovascularization</span><b>0</b></div></div><div class="compare-panel" id="compare-panel"><div class="compare-head"><strong>Rapid Progression Alert</strong><button class="tool-button" id="close-compare">Close</button></div><div class="timeline"><div><b>12 Mar 2024</b>Grade 0 · MA 0 · HE 0</div><div><b>18 Nov 2024</b>Grade 1 · MA 3 · HE 0</div><div><b>14 Mar 2026</b>Grade 1 · MA 5 · HE 0</div><div><b>Current Visit</b>Grade 3 · MA 14 · HE 9</div></div></div><div class="action-bar"><div><button class="agree" id="agree-button">✓ Agree with AI Verdict</button><button class="override" id="override-button">✎ Override Grade</button></div><div><button class="secondary-action" id="report-button">View Referral PDF</button><button class="secondary-action" id="notes-button">Clinical Notes</button></div></div></section><aside class="evidence"><div class="evidence-card"><span class="evidence-badge">⚠ REFER URGENT</span><span class="confidence">87% Calibrated</span><h3>Grade 3: Severe NPDR</h3><p>High-risk retinopathy in right eye. Quad-quadrant hemorrhages with exudates threat.</p><div class="flag"><b>⚠</b><span><strong>Macular Edema Threat</strong><small>Exudates within 500µm of fovea centralis</small></span></div><div class="flag warning"><b>ⓘ</b><span><strong>Glaucoma CDR Flag: 0.68</strong><small>Cup-to-disc ratio borderline</small></span></div><div class="flag normal"><b>✓</b><span><strong>Worst-Eye Protocol: OD</strong><small>Referral dictated by worse eye</small></span></div></div><div class="evidence-card"><h3>🛡 10-Point AI Self-Checks</h3><p>5 Passed · 1 Warning</p><div class="checks"><span class="check ok">✓ Valid Fundus</span><span class="check ok">✓ Quality Gradable</span><span class="check ok">✓ Confidence 87%</span><span class="check ok">✓ TTA Agreement 5/5</span><span class="check ok">✓ Attention 78%</span><span class="check">⚠ Edema Warning</span></div></div><div class="evidence-card"><h3>✨ Netra Assistant</h3><p>Decision support only · Grounded in case telemetry</p><div class="assistant"><b>Why Grade 3 and not Grade 2?</b><br>9 retinal hemorrhages across 3 quadrants and hard exudates covering 3.2% of the retina. Calibrated confidence is 87%.</div><button class="assistant-prompt">Why Grade 3?</button><button class="assistant-prompt">Progression since March?</button><button class="assistant-prompt">Macular risk details?</button></div></aside></div></section>
+      <section class="workstation-view" data-view="phc"><div class="work-summary"><div><h1>PHC village capture kiosk</h1><p>Guided capture, simple triage, vernacular communication, and offline store-and-forward sync.</p></div><span class="summary-number" id="outbox-count">0 <small>queued</small></span></div><div class="phc-grid"><div class="work-panel step-card"><span class="status-badge normal">STEP 1</span><h2>Retina Camera Capture</h2><p>Non-mydriatic fundus capture with a real-time quality gate.</p><div class="capture-box"><div><strong>Camera preview</strong><span id="capture-quality" class="status-badge normal">✓ Quality: Gradable</span><small id="capture-message">Sharp focus, adequate illumination, 45° FOV achieved.</small></div></div><div class="capture-actions"><button class="capture-test" data-quality="dark">Test Dark Capture</button><button class="capture-test" data-quality="blurry">Test Blurry Capture</button><button class="capture-test" data-quality="good">Good Capture</button><button id="queue-record">Queue Record</button></div></div><div class="work-panel step-card"><span class="status-badge warning">STEP 2</span><h2>Clear Action Verdict</h2><p>Health workers see only three actionable outcomes.</p><div class="tri-state" id="tri-refer"><h3>REFER TO SPECIALIST</h3><p>Changes detected. Case transmitted to the District Hospital ophthalmologist for confirmation.</p></div><div class="tri-state" id="tri-recapture" style="display:none;background:var(--status-warning-bg);border-color:var(--status-warning-border)"><h3>RECAPTURE IMAGE</h3><p>Image quality is insufficient. Increase flash and keep the camera steady.</p></div><p><strong>Referral:</strong> Chikkaballapur District Eye Hospital · Free bus pass generated.</p></div><div class="work-panel step-card"><span class="status-badge normal">STEP 3</span><h2>Patient Communication &amp; Sync</h2><p>Play the explanation aloud in the patient’s language.</p><div class="audio-box"><select id="audio-language"><option>ಕನ್ನಡ (Kannada)</option><option>हिंदी (Hindi)</option><option>English (Indian)</option></select><button id="speak-report">▶ Play for Patient</button><div class="transcript">ನಿಮ್ಮ ಕಣ್ಣಿನ ಸ್ಕ್ಯಾನ್‌ನಲ್ಲಿ ಬದಲಾವಣೆಗಳು ಕಂಡುಬಂದಿವೆ. ತಜ್ಞ ವೈದ್ಯರು ಪರಿಶೀಲಿಸುತ್ತಾರೆ.</div></div><p>Local SQLite Outbox: <strong id="outbox-status">Connected · Auto-synced</strong></p><button class="secondary-action" id="manual-sync">↻ Sync Queued Records Now</button></div></div></section>
+      <section class="workstation-view" data-view="district"><div class="work-summary"><div><h1>District telemedicine operations</h1><p>Monitor referral load, model agreement, and staffing capacity across rural PHCs.</p></div><span class="summary-number">1,240 <small>screened this month</small></span></div><div class="district-stack"><div class="metric-grid"><div class="metric-card"><span>Total Screened</span><strong>1,240</strong><span>Across 18 rural PHCs</span></div><div class="metric-card"><span>Referral Rate</span><strong>18.4%</strong><span>228 Grade ≥ 2 cases</span></div><div class="metric-card"><span>Pending Review</span><strong>37</strong><span>All under 12 hours</span></div><div class="metric-card"><span>AI Concordance</span><strong>94.2%</strong><span>Kappa 0.88</span></div></div><div class="analytics-grid"><div class="analytics-card"><h2>High-Risk PHC Hotspots</h2><table class="clinical-table"><thead><tr><th>Facility</th><th>Screened</th><th>Severe</th><th>Status</th></tr></thead><tbody><tr><td><strong>Bagepalli PHC</strong></td><td>184</td><td>19</td><td class="status-badge critical">High Risk</td></tr><tr><td><strong>Sidlaghatta PHC</strong></td><td>142</td><td>11</td><td class="status-badge warning">Elevated</td></tr><tr><td><strong>Gudibanda PHC</strong></td><td>98</td><td>3</td><td class="status-badge normal">Normal</td></tr><tr><td><strong>Chintamani PHC</strong></td><td>210</td><td>8</td><td class="status-badge normal">Normal</td></tr></tbody></table></div><div class="analytics-card"><h2>AI vs Specialist Agreement</h2><p>Overrides feed the continuous training loop.</p><div class="matrix-row"><span>Full Grade Concordance</span><div class="matrix-bar-wrap"><div class="matrix-bar" style="width:89%"></div></div><b>89.1%</b></div><div class="matrix-row"><span>Referral Concordance</span><div class="matrix-bar-wrap"><div class="matrix-bar" style="width:96%"></div></div><b>96.4%</b></div><div class="matrix-row"><span>Specialist Overrides</span><div class="matrix-bar-wrap"><div class="matrix-bar" style="width:5.8%"></div></div><b>5.8%</b></div></div></div><div class="work-panel step-card"><h2>Simulink Digital Twin Simulator</h2><p>Adjust volume, bandwidth, and specialist pool to keep review wait under 24 hours.</p><div class="simulation"><div><div class="sim-control"><label>Daily screening volume <strong id="sim-arrival-value">274 patients/day</strong></label><input id="sim-arrival-rate" type="range" min="100" max="500" value="274" step="10"></div><div class="sim-control"><label>Internet bandwidth <strong id="sim-bandwidth-value">10 Mbps</strong></label><select id="sim-bandwidth"><option value="2">2 Mbps</option><option value="10" selected>10 Mbps</option><option value="50">50 Mbps</option></select></div><div class="sim-control"><label>Active specialists <strong id="sim-specialists-value">2 Specialists</strong></label><input id="sim-specialists" type="range" min="1" max="6" value="2"></div></div><div class="sim-results"><div class="result-box"><small>Projected Wait Time</small><strong id="sim-wait">14.2 Hours</strong><span class="status-badge normal" id="sim-sla">✓ Complies with &lt;24h SLA</span></div><div class="result-box"><small>System Bottleneck</small><strong>Specialist Review</strong><span>Queue occupancy: 68%</span></div><div class="result-box"><small>Recommendation</small><p id="sim-recommendation">At <strong>274 patients/day</strong>, <strong>2 specialists</strong> project an average wait of <strong>14.2h</strong>.</p></div></div></div></div></div></section>
+      <section class="workstation-view patient-content" data-view="patient" data-scale="normal"><div class="work-summary patient-hero"><div><span class="status-badge normal">RURAL PATIENT MODE · ಗ್ರಾಮೀಣ ರೋಗಿ ವೀಕ್ಷಣೆ</span><h1>Namaskara, Ramesh Gowda</h1><p>Age 54 · Bagepalli Village · Today’s checkup</p></div><div><span>Text Size</span> <button class="font-scale active" data-scale="normal">A</button><button class="font-scale" data-scale="large">A+</button><button class="font-scale" data-scale="xlarge">A++</button></div></div><div class="patient-status"><h2>Specialist doctor checkup needed for right eye</h2><p id="patient-report">Your right eye has mild swelling and small blood spots caused by diabetes. Visit the District Hospital within 48 hours. Early care can protect your vision.</p><button class="secondary-action" id="patient-speak-report">▶ Listen in your language</button></div><div class="patient-eyes"><div class="patient-panel"><h3>Right Eye · Needs Treatment <span class="status-badge critical">🔴 Attention</span></h3><p>Small red spots and water swelling near the vision center.</p><div class="meter"><label>Vision clarity <strong>65%</strong></label><div class="meter-track"><div class="meter-fill" style="width:65%"></div></div></div><div class="meter"><label>Sugar impact <strong>82%</strong></label><div class="meter-track"><div class="meter-fill" style="width:82%;background:var(--status-critical)"></div></div></div><p><strong>What doctor says:</strong> A specialist can stop further leakage with simple treatment.</p></div><div class="patient-panel"><h3>Left Eye · Mild Baseline <span class="status-badge warning">🟡 Safe for Now</span></h3><p>Clean and healthy appearance. Tiny harmless dots only.</p><div class="meter"><label>Vision clarity <strong>92%</strong></label><div class="meter-track"><div class="meter-fill" style="width:92%;background:var(--status-normal)"></div></div></div><div class="meter"><label>Sugar impact <strong>25%</strong></label><div class="meter-track"><div class="meter-fill" style="width:25%;background:var(--status-normal)"></div></div></div><p><strong>Good news:</strong> Daily diabetes tablets and walking help keep this eye healthy.</p></div></div><div class="education-grid"><div class="patient-panel"><h3>Like thin water pipes</h3><p>Tiny blood vessels can become weak when sugar stays high.</p></div><div class="patient-panel"><h3>Small leakage drops</h3><p>Weak vessels can leak fluid or blood before pain begins.</p></div><div class="patient-panel"><h3>Early care protects sight</h3><p>Finding changes early gives doctors simple ways to protect vision.</p></div></div><div class="action-grid"><div class="patient-panel"><h3>1. Visit District Eye Hospital</h3><p>Free treatment and bus voucher under Ayushman Bharat.</p></div><div class="patient-panel"><h3>2. Take sugar tablets daily</h3><p>Avoid sweets and walk 20 minutes each morning.</p></div><div class="patient-panel"><h3>3. Protect eyes in the sun</h3><p>Wear a cap or sunglasses in the fields.</p></div><div class="patient-panel"><h3>4. Rush for danger signs</h3><p>Call 104 for sudden floaters, flashes, or a dark curtain.</p></div></div></section>
+      </main>
     </div>
-
-    <div class="dash-top-actions">
-      <!-- Role Switcher: Go to Patient Portal -->
-      <a href="dashboard.html" class="btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; text-decoration: none;">
-        <span>👤 Switch to Patient Portal</span>
-      </a>
-
-      <!-- Theme Switcher -->
-      <button class="theme-toggle-btn" id="themeToggleDoctorBtn" title="Toggle Exam Room Mode">
-        <span id="themeDoctorIcon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </span>
-      </button>
-
-      <!-- Doctor Profile Chip -->
-      <div class="user-profile-chip" style="cursor: default;">
-        <div class="user-initial-avatar" style="background: var(--brand-primary); color: #fff;">M</div>
-        <div>
-          <strong style="font-size: 0.82rem; display: block; color: var(--text-primary);">Dr. Meera Iyer</strong>
-          <span style="font-size: 0.68rem; color: var(--text-secondary); display: block;">Retina Specialist • DOC-KA-2026-4412</span>
-        </div>
-      </div>
-
-      <a href="login.html" class="btn-control" title="Sign Out" style="padding: 6px 10px; font-size: 0.78rem; color: var(--status-critical); text-decoration: none;">
-        Sign Out 🚪
-      </a>
-    </div>
-  </header>
-
-  <!-- CLINICIAN BODY -->
-  <main style="flex: 1; padding: 24px; max-width: 1360px; margin: 0 auto; width: 100%;">
-    
-    <!-- STATS STRIP -->
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
-      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Pending Triage</span>
-          <span class="clinical-badge status-warning" style="font-size: 0.68rem;">4 High Priority</span>
-        </div>
-        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-top: 6px;">14</h3>
-        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">From 4 rural primary health centres</p>
-      </div>
-
-      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Reviewed Today</span>
-          <span class="clinical-badge status-normal" style="font-size: 0.68rem;">Avg 22s / case</span>
-        </div>
-        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--brand-primary); margin-top: 6px;">38</h3>
-        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">29 Normal, 6 Mild, 3 Referable</p>
-      </div>
-
-      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Referrals Dispatched</span>
-          <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Urgent Vitreo-Retinal</span>
-        </div>
-        <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--status-critical); margin-top: 6px;">6</h3>
-        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Routed to District Hospital Laser Unit</p>
-      </div>
-
-      <div style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">AI Concordance</span>
-          <span class="clinical-badge status-normal" style="font-size: 0.68rem;">QWK: 0.91</span>
-        </div>
-        <h3 style="font-size: 1.8rem; font-weight: 800; color: #22c55e; margin-top: 6px;">96.4%</h3>
-        <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Doctor agreed with model classification</p>
-      </div>
-    </div>
-
-    <!-- MAIN TWO-COLUMN WORKFLOW -->
-    <div style="display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start;">
-      
-      <!-- LEFT COLUMN: PATIENT TRIAGE QUEUE -->
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Triage Worklist (PHC Scans)</h4>
-          <span style="font-size: 0.72rem; color: var(--text-secondary);">Auto-Refreshed</span>
-        </div>
-
-        <!-- Filter tabs -->
-        <div style="display: flex; gap: 6px; margin-bottom: 14px;">
-          <button class="sub-tab-btn active" style="font-size: 0.72rem; padding: 4px 8px;">All (14)</button>
-          <button class="sub-tab-btn" style="font-size: 0.72rem; padding: 4px 8px; color: var(--status-critical);">Referable ≥2 (4)</button>
-          <button class="sub-tab-btn" style="font-size: 0.72rem; padding: 4px 8px;">Normal 0-1 (10)</button>
-        </div>
-
-        <!-- Worklist Items -->
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          
-          <!-- Item 1: Selected Case (Ramesh Kumar) -->
-          <div style="padding: 12px; border-radius: var(--radius-md); border: 2px solid var(--brand-primary); background: var(--bg-surface); cursor: pointer; position: relative;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <strong style="font-size: 0.88rem; color: var(--text-primary);">Ramesh Kumar, 62M</strong>
-                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">PHC Chikkaballapur • Captured 12m ago</span>
-              </div>
-              <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Grade 2 Referable</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
-              <span>AI Conf: 94.2% • OD Fundus</span>
-              <span style="color: var(--brand-primary); font-weight: 600;">Currently Active 👁️</span>
-            </div>
-          </div>
-
-          <!-- Item 2: Suresh Gowda -->
-          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Suresh Gowda: Grade 3 Severe NPDR (Venous beading, multiple blot hemorrhages). Recommended immediate laser photocoagulation referral.')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <strong style="font-size: 0.88rem; color: var(--text-primary);">Suresh Gowda, 58M</strong>
-                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Devanahalli Rural PHC • Captured 25m ago</span>
-              </div>
-              <span class="clinical-badge status-critical" style="font-size: 0.68rem;">Grade 3 Urgent</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
-              <span>AI Conf: 97.8% • OS Fundus</span>
-              <button class="reminder-action-tag" style="font-size: 0.68rem;">Review</button>
-            </div>
-          </div>
-
-          <!-- Item 3: Sunita Devi -->
-          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Sunita Devi: Grade 1 Mild NPDR. 1 microaneurysm detected. Scheduled 6-month routine PHC recall.')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <strong style="font-size: 0.88rem; color: var(--text-primary);">Sunita Devi, 49F</strong>
-                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Sidlaghatta CHC • Captured 40m ago</span>
-              </div>
-              <span class="clinical-badge status-warning" style="font-size: 0.68rem;">Grade 1 Mild</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
-              <span>AI Conf: 91.5% • OD Fundus</span>
-              <button class="reminder-action-tag" style="font-size: 0.68rem;">Review</button>
-            </div>
-          </div>
-
-          <!-- Item 4: Ananya Sharma -->
-          <div style="padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-surface-subtle); cursor: pointer;" onclick="alert('Viewing Ananya Sharma: Grade 0 Normal (No Diabetic Retinopathy). Annual screening recall scheduled.')">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <strong style="font-size: 0.88rem; color: var(--text-primary);">Ananya Sharma, 45F</strong>
-                <span style="display: block; font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px;">Christ Univ PHC • Screened today</span>
-              </div>
-              <span class="clinical-badge status-normal" style="font-size: 0.68rem;">Grade 0 Normal</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary);">
-              <span>Verified by Dr. Meera Iyer</span>
-              <span style="color: #22c55e; font-size: 0.75rem; font-weight: 600;">Signed Off ✓</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- RIGHT COLUMN: EXPLAINABLE AI CASE REVIEW PANEL -->
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
-        
-        <!-- Case Header -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 20px;">
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">Case: Ramesh Kumar</h3>
-              <span class="clinical-badge status-critical">Grade 2 — Moderate NPDR (Referable)</span>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">
-              Patient ID: <strong>NETRA-2026-9104</strong> • Age: <strong>62</strong> • Gender: <strong>Male</strong> • Diabetes: <strong>Type 2 (8 yrs)</strong> • Facility: <strong>PHC Chikkaballapur</strong>
-            </p>
-          </div>
-          <div style="text-align: right;">
-            <span style="font-size: 0.72rem; color: var(--text-secondary); display: block;">Frontline Screening Officer</span>
-            <strong style="font-size: 0.85rem; color: var(--text-primary);">Lakshmi, PHC Nurse Officer</strong>
-          </div>
-        </div>
-
-        <!-- Case Inspection Grid -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-          <!-- Left: Multi-Layer Viewer -->
-          <div>
-            <div style="position: relative; width: 100%; height: 320px; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center;">
-              <img id="doctorFundusView" src="assets/images/retinal_fundus_od.jpg" alt="Ramesh Fundus" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-              <div id="doctorGradcamOverlay" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 60% 45%, rgba(255, 68, 68, 0.4) 0%, rgba(255, 170, 0, 0.25) 30%, transparent 65%); display: none;"></div>
-            </div>
-
-            <!-- Layer Switchers -->
-            <div style="display: flex; gap: 6px; margin-top: 10px; justify-content: center;">
-              <button class="btn-layer-toggle active" id="btnLayerDocOrig">Original</button>
-              <button class="btn-layer-toggle" id="btnLayerDocCam">Grad-CAM Heatmap</button>
-              <button class="btn-layer-toggle" id="btnLayerDocLes">Lesions Highlight</button>
-              <button class="btn-layer-toggle" id="btnLayerDocVes">Vessel Contrast</button>
-            </div>
-          </div>
-
-          <!-- Right: AI Findings & Clinician Verification -->
-          <div style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">AI Model Biomarker Readout</h4>
-              
-              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.83rem;">
-                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                  <span>Predicted DR Severity:</span>
-                  <strong style="color: var(--status-critical);">Grade 2 (Moderate NPDR)</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                  <span>Calibrated Confidence:</span>
-                  <strong>94.2% (Ensemble ResNet-50)</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                  <span>Microaneurysm Detection:</span>
-                  <span style="color: var(--accent-action); font-weight: 600;">7 detected (Temporal macula)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                  <span>Hard Exudates (Lipid leakage):</span>
-                  <span style="color: var(--status-critical); font-weight: 600;">Present (Inferotemporal ring)</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: var(--bg-surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-                  <span>Optic Disc Cup-to-Disc Ratio:</span>
-                  <span>0.44 (Normal range &lt; 0.6)</span>
-                </div>
-              </div>
-
-              <!-- Doctor Clinical Note Input -->
-              <div style="margin-top: 14px;">
-                <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Clinician Diagnostic Remarks / Prescription:</label>
-                <textarea class="form-control" rows="2" style="font-size: 0.8rem;" placeholder="e.g. Confirmed Grade 2 NPDR with macular threat. Schedule dilated slit-lamp OCT and start tighter glycemic control.">Confirmed Moderate NPDR with inferotemporal exudates. Refer to District Ophthalmology Clinic for macular OCT.</textarea>
-              </div>
-            </div>
-
-            <!-- Action Buttons for Clinician -->
-            <div style="display: flex; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
-              <button class="btn-primary" style="flex: 1.2; padding: 10px; font-size: 0.85rem;" onclick="alert('✓ Dr. Meera Iyer verified Case NETRA-2026-9104: Grade 2 NPDR confirmed. Referral notification dispatched to PHC Chikkaballapur.')">
-                ✓ Confirm AI Grade & Issue Referral
-              </button>
-              <button class="btn-secondary" style="flex: 0.8; padding: 10px; font-size: 0.85rem;" onclick="const newGrade = prompt('Enter override DR Grade (0: Normal, 1: Mild, 2: Moderate, 3: Severe, 4: Proliferative):', '1'); if(newGrade !== null) alert('Case updated to Grade ' + newGrade + ' by Dr. Meera Iyer.');">
-                ✎ Override Grade
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </main>
-
-  <footer style="padding: 14px 24px; text-align: center; font-size: 0.78rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle); background: var(--bg-surface);">
-    <span>Netra Clinician Tele-Triage • Human-in-the-Loop AI • SIH 2026 PS 26038</span>
-  </footer>
-
-  <script src="js/translations.js"></script>
-  <script>
-    // Simple theme switcher for doctor portal
-    const themeBtn = document.getElementById('themeToggleDoctorBtn');
-    if (themeBtn) {
-      themeBtn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('netra_theme', next);
-      });
-      const savedTheme = localStorage.getItem('netra_theme') || 'light';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-
-    // Layer toggles for Doctor Fundus Viewer
-    const img = document.getElementById('doctorFundusView');
-    const overlay = document.getElementById('doctorGradcamOverlay');
-    const bOrig = document.getElementById('btnLayerDocOrig');
-    const bCam = document.getElementById('btnLayerDocCam');
-    const bLes = document.getElementById('btnLayerDocLes');
-    const bVes = document.getElementById('btnLayerDocVes');
-    const allBtns = [bOrig, bCam, bLes, bVes];
-
-    function activateBtn(btn) {
-      allBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    if (bOrig) {
-      bOrig.onclick = () => {
-        activateBtn(bOrig);
-        img.style.filter = 'none';
-        overlay.style.display = 'none';
-      };
-    }
-    if (bCam) {
-      bCam.onclick = () => {
-        activateBtn(bCam);
-        img.style.filter = 'none';
-        overlay.style.display = 'block';
-      };
-    }
-    if (bLes) {
-      bLes.onclick = () => {
-        activateBtn(bLes);
-        img.style.filter = 'contrast(140%) brightness(95%)';
-        overlay.style.display = 'none';
-      };
-    }
-    if (bVes) {
-      bVes.onclick = () => {
-        activateBtn(bVes);
-        img.style.filter = 'grayscale(100%) contrast(200%) invert(20%)';
-        overlay.style.display = 'none';
-      };
-    }
-  </script>
+  </div>
+  <script src="js/workstation.js"></script>
 </body>
 </html>
