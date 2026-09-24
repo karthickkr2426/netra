@@ -14,12 +14,12 @@
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body style="height: 100vh; overflow: hidden; display: flex;">
+<body class="dashboard-body">
 
   <!-- ========================================================================
        PATIENT DASHBOARD
        ======================================================================== -->
-  <div id="view-dashboard" style="display: flex; width: 100%; height: 100vh; overflow: hidden;">
+  <div id="view-dashboard">
     <!-- LEFT SIDEBAR -->
     <aside class="dash-sidebar">
       <div class="sidebar-top">
@@ -421,9 +421,9 @@
         <div class="modal-layer-viewer">
           <!-- Multi-Layer Fundus Image Viewer -->
           <div class="modal-image-display">
-            <div style="position: relative; width: 340px; height: 340px;">
+            <div class="fundus-preview-wrap" style="position: relative; width: 100%; max-width: 340px; aspect-ratio: 1 / 1;">
               <img id="fundusDisplayImg" class="fundus-interactive-canvas" src="assets/images/retinal_fundus_od.jpg" alt="Retinal fundus image">
-              <canvas id="fundusCanvasOverlay" style="position: absolute; inset: 0; pointer-events: none; border-radius: var(--radius-lg);"></canvas>
+              <canvas id="fundusCanvasOverlay" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: var(--radius-lg);"></canvas>
             </div>
             
             <!-- Layer Toggles -->
